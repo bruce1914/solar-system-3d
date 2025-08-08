@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar System 3D Explorer</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        
+        #container {
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            z-index: 100;
+        }
+        
+        #controls {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 100;
+        }
+        
+        .planet-info {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 100;
+            display: none;
+        }
+        
+        .control-panel {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            z-index: 100;
+            min-width: 250px;
+        }
+        
+        .control-group {
+            margin-bottom: 15px;
+        }
+        
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .slider {
+            width: 100%;
+            margin: 5px 0;
+        }
+        
+        .checkbox {
+            margin-right: 10px;
+        }
+        
+        .button {
+            background: #4CAF50;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .button:hover {
+            background: #45a049;
+        }
+        
+        .loading {
+            color: #FFD700;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    
+    <div id="info">
+        <h3>Solar System 3D Explorer</h3>
+        <p>Explore our solar system in 3D!</p>
+    </div>
+    
+    <div id="controls">
+        <strong>Controls:</strong><br>
+        Mouse: Look around<br>
+        WASD: Move camera<br>
+        Space: Move up<br>
+        Shift: Move down<br>
+        Scroll: Zoom in/out<br>
+        Click planets for info
+    </div>
+    
+    <div id="control-panel" class="control-panel">
+        <h3>Solar System Controls</h3>
+        
+        <div class="control-group">
+            <label>
+                <input type="checkbox" id="animation-toggle" class="checkbox">
+                Enable Planet Animation
+            </label>
+        </div>
+        
+        <div class="control-group">
+            <label for="speed-slider">Animation Speed:</label>
+            <input type="range" id="speed-slider" class="slider" min="0.1" max="5" value="1" step="0.1">
+            <span id="speed-value">1.0x</span>
+        </div>
+        
+        <div class="control-group">
+            <button id="download-textures" class="button">Download HD Textures</button>
+            <div id="texture-status"></div>
+        </div>
+        
+        <div class="control-group">
+            <button id="reset-camera" class="button">Back to Overview</button>
+        </div>
+        
+        <div class="control-group">
+            <p style="color: #ccc; font-size: 12px; margin: 10px 0;">💡 Tip: Double-click any planet to zoom in!</p>
+        </div>
+    </div>
+    
+    <div id="planet-info" class="planet-info">
+        <h4 id="planet-name"></h4>
+        <p id="planet-description"></p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="solar-system-ultra.js?v=1723000600"></script>
+</body>
+</html>
