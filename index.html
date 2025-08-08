@@ -104,6 +104,10 @@
         .loading {
             color: #FFD700;
         }
+        /* Safety: hide stale elements if an old HTML is cached */
+        #download-textures, #texture-status {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -140,10 +144,6 @@
             <span id="speed-value">1.0x</span>
         </div>
         
-        <div class="control-group">
-            <button id="download-textures" class="button">Download HD Textures</button>
-            <div id="texture-status"></div>
-        </div>
         
         <div class="control-group">
             <button id="reset-camera" class="button">Back to Overview</button>

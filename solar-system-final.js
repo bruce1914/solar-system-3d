@@ -444,12 +444,6 @@ class SolarSystem {
             speedValue.textContent = `${this.animationSpeed.toFixed(1)}x`;
         });
         
-        const downloadButton = document.getElementById('download-textures');
-        const textureStatus = document.getElementById('texture-status');
-        downloadButton.addEventListener('click', () => {
-            textureStatus.innerHTML = '<span class="loading">HD textures are now procedurally generated at 2048x2048 resolution!</span>';
-        });
-        
         const resetButton = document.getElementById('reset-camera');
         resetButton.addEventListener('click', () => {
             this.camera.position.set(0, 30, 80);

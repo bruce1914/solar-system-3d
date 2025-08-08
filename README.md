@@ -1,34 +1,40 @@
 # Solar System 3D Explorer
 
-一个交互式的3D太阳系浏览器，使用Three.js构建。
+An interactive 3D Solar System explorer built with Three.js.
 
-## 功能特性
+## Features
 
-- 🌟 包含太阳、9大行星（包括冥王星）和月球
-- 🪐 真实的行星运行轨道动画
-- 🌌 小行星带模拟
-- 🎮 完整的键盘和鼠标控制
-- 📱 点击行星查看详细信息
-- ⭐ 美丽的星空背景
+- 🌟 Sun, 9 planets (including Pluto), and the Moon
+- 🪐 Realistic orbital animation
+- 🌌 Asteroid belt simulation
+- 🎮 Full keyboard and mouse controls
+- 📱 Click planets to view details
+- ⭐ Beautiful starfield background
 
-## 控制方式
+## Screenshots
 
-### 鼠标控制
-- **拖拽**: 旋转视角
-- **滚轮**: 缩放
-- **点击行星**: 显示行星信息
+<img src="snapshot1.jpg" alt="Solar System 3D - Overview" width="60%" />
 
-### 键盘控制
-- **W/A/S/D**: 前后左右移动相机
-- **空格键**: 向上移动
-- **Shift**: 向下移动
+<img src="snapshot2.jpg" alt="Solar System 3D - Close-up" width="60%" />
 
-## 如何运行
+## Controls
 
-1. 在项目目录中启动本地服务器
-2. 在浏览器中打开 `index.html`
+### Mouse
+- **Drag**: Rotate camera
+- **Scroll**: Zoom in/out
+- **Click planet**: Show planet info
 
-### 使用Python启动服务器:
+### Keyboard
+- **W/A/S/D**: Move camera forward/left/back/right
+- **Space**: Move up
+- **Shift**: Move down
+
+## How to Run
+
+1. Start a local web server in the project directory
+2. Open `index.html` in the browser via the server URL
+
+### Start a local server (Python):
 ```bash
 # Python 3
 python -m http.server 8000
@@ -37,34 +43,34 @@ python -m http.server 8000
 python -m SimpleHTTPServer 8000
 ```
 
-然后在浏览器中访问: `http://localhost:8000`
+Then open: `http://localhost:8000`
 
-## 技术栈
+## Tech Stack
 
-- **Three.js**: 3D图形渲染
-- **HTML5/CSS3**: 用户界面
-- **JavaScript ES6**: 应用逻辑
+- **Three.js**: 3D graphics rendering
+- **HTML5/CSS3**: User interface
+- **JavaScript ES6**: Application logic
 
-## 行星信息
+## Celestial Objects
 
-程序包含以下天体：
-- 太阳 (中心恒星)
-- 水星、金星、地球、火星 (内行星)
-- 木星、土星、天王星、海王星 (外行星)
-- 冥王星 (矮行星)
-- 月球 (地球卫星)
-- 小行星带 (火星和木星之间)
+This project includes:
+- Sun (central star)
+- Mercury, Venus, Earth, Mars (inner planets)
+- Jupiter, Saturn, Uranus, Neptune (outer planets)
+- Pluto (dwarf planet)
+- Moon (Earth's satellite)
+- Asteroid belt (between Mars and Jupiter)
 
-每个行星都有：
-- 相对真实的大小比例
-- 符合实际的轨道距离
-- 不同的运行速度
-- 详细的信息描述
+Each planet features:
+- Approximate relative size
+- Realistic orbital distance
+- Different orbital speeds
+- Detailed description
 
-## 特殊效果
+## Special Effects
 
-- 土星和天王星有环系统
-- 月球围绕地球运行
-- 小行星带缓慢旋转
-- 真实的光照效果
-- 阴影渲染
+- Ring systems for Saturn and Uranus
+- Moon orbiting Earth
+- Slowly rotating asteroid belt
+- Realistic lighting
+- Shadow rendering

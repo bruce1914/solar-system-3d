@@ -456,19 +456,16 @@ class SolarSystem {
             this.animationSpeed = parseFloat(e.target.value);
             speedValue.textContent = `${this.animationSpeed.toFixed(2)}x`;
         });
-
+        
         const resetButton = document.getElementById('reset-camera');
         resetButton.addEventListener('click', () => {
             this.resetCamera();
         });
-
-        const downloadButton = document.getElementById('download-textures');
-        downloadButton.style.display = 'none'; // Hide the button as textures are now loaded by default
-
+        
         // Add mouse event listeners for planet interaction
         this.setupMouseInteraction();
     }
-
+    
     setupMouseInteraction() {
         const canvas = this.renderer.domElement;
         let clickCount = 0;
