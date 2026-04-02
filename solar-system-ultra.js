@@ -39,8 +39,9 @@ class SolarSystem {
         this.selectedPlanet = null;
 
         // Animation state
-        this.animationEnabled = false;
+        this.animationEnabled = true;
         this.animationSpeed = 1.0;
+        this.hoveredPlanet = null;
 
         // Texture URLs from a reliable source (e.g., NASA, etc.)
         this.textureUrls = {
@@ -89,17 +90,17 @@ class SolarSystem {
 
     setupRenderer() {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.renderer.outputEncoding = THREE.sRGBEncoding;
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        this.renderer.toneMappingExposure = 0.6;
+        this.renderer.toneMappingExposure = 0.9;
         document.getElementById('container').appendChild(this.renderer.domElement);
     }
 
     setupCamera() {
-        this.camera.position.set(0, 50, 150);
+        this.camera.position.set(0, 85, 260);
         this.camera.lookAt(0, 0, 0);
     }
 
@@ -179,6 +180,18 @@ class SolarSystem {
         
         const starField = new THREE.Points(starsGeometry, starsMaterial);
         this.scene.add(starField);
+
+        try {
+            const skyTexture = await this.textureLoader.loadAsync(this.textureUrls.starfield);
+            skyTexture.encoding = THREE.sRGBEncoding;
+            const sky = new THREE.Mesh(
+                new THREE.SphereGeometry(18000, 64, 64),
+                new THREE.MeshBasicMaterial({ map: skyTexture, side: THREE.BackSide, transparent: true, opacity: 0.35 })
+            );
+            this.scene.add(sky);
+        } catch (error) {
+            console.warn('Failed to load starfield texture:', error);
+        }
         
         console.log('Environment created successfully');
     }
@@ -187,15 +200,15 @@ class SolarSystem {
         console.log('Creating solar system...');
         
         const planetData = [
-            { name: 'Sun', radius: 15, distance: 0, speed: 0, texture: this.textureUrls.sun, emissive: 0xffddaa },
-            { name: 'Mercury', radius: 2, distance: 50, speed: 1.2, texture: this.textureUrls.mercury },
-            { name: 'Venus', radius: 3, distance: 70, speed: 0.9, texture: this.textureUrls.venus },
-            { name: 'Earth', radius: 3.2, distance: 100, speed: 0.7, texture: this.textureUrls.earth, nightTexture: this.textureUrls.earth_night, cloudTexture: this.textureUrls.earth_clouds },
-            { name: 'Mars', radius: 2.5, distance: 130, speed: 0.5, texture: this.textureUrls.mars },
-            { name: 'Jupiter', radius: 8, distance: 200, speed: 0.3, texture: this.textureUrls.jupiter },
-            { name: 'Saturn', radius: 7, distance: 280, speed: 0.2, texture: this.textureUrls.saturn, rings: { texture: this.textureUrls.saturn_rings, innerRadius: 9, outerRadius: 15 } },
-            { name: 'Uranus', radius: 4, distance: 350, speed: 0.15, texture: this.textureUrls.uranus },
-            { name: 'Neptune', radius: 4, distance: 420, speed: 0.1, texture: this.textureUrls.neptune },
+            { name: 'Sun', radius: 15, distance: 0, speed: 0, texture: this.textureUrls.sun, emissive: 0xffddaa, info: 'Solar System central star. Surface temperature ~5,500°C.' },
+            { name: 'Mercury', radius: 2, distance: 50, speed: 1.2, texture: this.textureUrls.mercury, info: 'Closest planet to the Sun with extreme day/night temperatures.' },
+            { name: 'Venus', radius: 3, distance: 70, speed: 0.9, texture: this.textureUrls.venus, info: 'Dense CO₂ atmosphere causes strong greenhouse effect.' },
+            { name: 'Earth', radius: 3.2, distance: 100, speed: 0.7, texture: this.textureUrls.earth, nightTexture: this.textureUrls.earth_night, cloudTexture: this.textureUrls.earth_clouds, info: 'Our home world with liquid-water oceans and complex life.' },
+            { name: 'Mars', radius: 2.5, distance: 130, speed: 0.5, texture: this.textureUrls.mars, info: 'The red planet with giant volcanoes and canyons.' },
+            { name: 'Jupiter', radius: 8, distance: 200, speed: 0.3, texture: this.textureUrls.jupiter, info: 'Largest planet; a gas giant with powerful storms.' },
+            { name: 'Saturn', radius: 7, distance: 280, speed: 0.2, texture: this.textureUrls.saturn, rings: { texture: this.textureUrls.saturn_rings, innerRadius: 9, outerRadius: 15 }, info: 'Known for bright icy rings and many moons.' },
+            { name: 'Uranus', radius: 4, distance: 350, speed: 0.15, texture: this.textureUrls.uranus, info: 'Ice giant rotating on a dramatic axial tilt.' },
+            { name: 'Neptune', radius: 4, distance: 420, speed: 0.1, texture: this.textureUrls.neptune, info: 'Distant ice giant with very fast atmospheric winds.' },
         ];
 
         const promises = planetData.map(data => this.createPlanet(data));
@@ -207,7 +220,7 @@ class SolarSystem {
             console.log(`Adding planet ${planet.name} to scene`);
             this.scene.add(planet.group);
             if (planet.distance > 0) {
-                this.createOrbitPath(planet.distance);
+                this.scene.add(this.createOrbitPath(planet.distance));
             }
         });
 
@@ -261,6 +274,7 @@ class SolarSystem {
         const mesh = new THREE.Mesh(geometry, material);
         mesh.castShadow = true;
         mesh.receiveShadow = true;
+        mesh.userData = { name: data.name, info: data.info || '' };
 
         const group = new THREE.Group();
         group.add(mesh);
@@ -373,16 +387,15 @@ class SolarSystem {
         const texture = this.textureLoader.load(ringData.texture);
         
         // Use MeshBasicMaterial with enhanced properties for better visibility
-        const material = new THREE.MeshBasicMaterial({
+        const material = new THREE.MeshStandardMaterial({
             map: texture,
             transparent: true,
             side: THREE.DoubleSide,
             alphaTest: 0.001,
-            opacity: 1.0,
-            color: 0xffffff,
-            // Add emissive to make rings more visible
-            emissive: 0x444444,
-            emissiveIntensity: 0.2
+            opacity: 0.9,
+            color: 0xf6e8c6,
+            roughness: 0.8,
+            metalness: 0.0
         });
 
         const geometry = new THREE.RingGeometry(ringData.innerRadius, ringData.outerRadius, 128);
@@ -402,7 +415,7 @@ class SolarSystem {
             points.push(new THREE.Vector3(Math.cos(theta) * radius, 0, Math.sin(theta) * radius));
         }
         geometry.setFromPoints(points);
-        const material = new THREE.LineBasicMaterial({ color: 0x333333 });
+        const material = new THREE.LineBasicMaterial({ color: 0x4a4a4a, transparent: true, opacity: 0.55 });
         return new THREE.Line(geometry, material);
     }
 
@@ -419,8 +432,8 @@ class SolarSystem {
             const asteroid = new THREE.Mesh(geometry, material);
 
             const angle = Math.random() * Math.PI * 2;
-            const distance = 800 + Math.random() * 200;
-            const y = (Math.random() - 0.5) * 20;
+            const distance = 155 + Math.random() * 35;
+            const y = (Math.random() - 0.5) * 8;
 
             asteroid.position.set(Math.cos(angle) * distance, y, Math.sin(angle) * distance);
             asteroid.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
@@ -487,6 +500,17 @@ class SolarSystem {
         
         canvas.addEventListener('mousemove', (event) => {
             this.updateMousePosition(event);
+            this.handleHover();
+        });
+
+        canvas.addEventListener('pointerdown', (event) => {
+            if (event.detail === 1) {
+                setTimeout(() => {
+                    if (event.detail === 1) {
+                        this.handleSingleClick(event);
+                    }
+                }, 260);
+            }
         });
     }
     
@@ -515,6 +539,50 @@ class SolarSystem {
                 this.zoomToPlanet(planet);
             }
         }
+    }
+
+    handleSingleClick(event) {
+        this.updateMousePosition(event);
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+        const planetMeshes = this.planets.map(planet => planet.mesh);
+        const intersects = this.raycaster.intersectObjects(planetMeshes);
+        if (intersects.length > 0) {
+            const { name, info } = intersects[0].object.userData;
+            this.showPlanetInfo(name, info);
+        } else {
+            this.hidePlanetInfo();
+        }
+    }
+
+    handleHover() {
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+        const planetMeshes = this.planets.map(planet => planet.mesh);
+        const intersects = this.raycaster.intersectObjects(planetMeshes);
+        this.planets.forEach((planet) => {
+            const material = planet.mesh.material;
+            if (material && typeof material.emissiveIntensity === 'number' && planet.name !== 'Sun') {
+                material.emissiveIntensity = Math.max(0, material.emissiveIntensity - 0.02);
+            }
+        });
+        if (intersects.length > 0) {
+            const hovered = intersects[0].object;
+            if (hovered.material && typeof hovered.material.emissiveIntensity === 'number' && hovered.userData.name !== 'Sun') {
+                hovered.material.emissive = new THREE.Color(0x335577);
+                hovered.material.emissiveIntensity = 0.25;
+            }
+        }
+    }
+
+    showPlanetInfo(name, info) {
+        const panel = document.getElementById('planet-info');
+        document.getElementById('planet-name').textContent = name;
+        document.getElementById('planet-description').textContent = info;
+        panel.style.display = 'block';
+    }
+
+    hidePlanetInfo() {
+        const panel = document.getElementById('planet-info');
+        panel.style.display = 'none';
     }
     
     zoomToPlanet(planet) {
